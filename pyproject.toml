@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hictopswapper"
+version = "0.1.0"
+description = "Reimplementation of HICTOP Swapper (Bambu plate-swap 3MF concatenator) with AMS-safe metadata handling"
+requires-python = ">=3.10"
+
+[project.scripts]
+hictopswapper = "hictopswapper.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hictopswapper = ["profiles/*.gcode", "static/*.html"]

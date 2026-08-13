@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HICTOP Swapper — AMS-safe rebuild</title>
+<style>
+  :root { --bg:#262e30; --panel:#eee; --accent:#0a7; --err:#c33; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.45 -apple-system, "Segoe UI", sans-serif;
+         background:var(--panel); color:#222; }
+  header { background:var(--bg); color:#fff; padding:12px 20px; }
+  header h1 { margin:0; font-size:18px; }
+  header small { opacity:.7; }
+  main { max-width:900px; margin:16px auto; padding:0 16px 48px; }
+  #dropzone { border:2px dashed #999; border-radius:12px; background:#fff;
+              padding:36px; text-align:center; cursor:pointer; }
+  #dropzone.over { border-color:var(--accent); background:#eafff7; }
+  #dropzone p { margin:4px 0; }
+  .muted { color:#777; }
+  ol#playlist { list-style:none; margin:16px 0; padding:0; }
+  li.item { background:#fff; border-radius:10px; padding:10px 14px;
+            margin-bottom:8px; display:flex; gap:14px; align-items:flex-start;
+            box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  li.item .name { font-weight:600; word-break:break-all; }
+  li.item .meta { font-size:12px; color:#666; }
+  .fil { display:inline-block; margin:2px 8px 2px 0; font-size:12px;
+         white-space:nowrap; }
+  .fil i { display:inline-block; width:12px; height:12px; border-radius:3px;
+           margin-right:4px; vertical-align:-2px; border:1px solid #0002; }
+  .controls { margin-left:auto; text-align:right; white-space:nowrap; }
+  .controls input[type=number] { width:64px; }
+  .controls button { margin-left:4px; }
+  button { cursor:pointer; border:1px solid #bbb; background:#fff;
+           border-radius:6px; padding:4px 10px; }
+  button.primary { background:var(--accent); border-color:var(--accent);
+                   color:#fff; font-size:15px; padding:8px 22px; }
+  button:disabled { opacity:.5; cursor:default; }
+  fieldset { border:1px solid #ccc; border-radius:10px; background:#fff;
+             margin:0 0 16px; }
+  legend { font-weight:600; }
+  label { margin-right:16px; }
+  #result { background:#fff; border-radius:10px; padding:14px 18px;
+            display:none; white-space:pre-wrap; font-family:ui-monospace,monospace;
+            font-size:12px; }
+  #result.err { color:var(--err); display:block; }
+  #result.ok { display:block; }
+  #result a { color:var(--accent); font-weight:700; }
+  #stats { font-size:13px; margin:8px 0 16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>自动换盘 HICTOP Swapper <small>AMS-safe rebuild · continuous plate printing</small></h1>
+</header>
+<main>
+  <div id="dropzone">
+    <p><strong>Drop sliced .gcode.3mf files here</strong></p>
+    <p class="muted">or click to choose — each file contributes one plate to the playlist</p>
+    <input type="file" id="fileinput" accept=".3mf" multiple hidden>
+  </div>
+
+  <ol id="playlist"></ol>
+  <div id="stats"></div>
+
+  <fieldset>
+    <legend>Export</legend>
+    <label>Printer
+      <select id="printer"></select>
+    </label>
+    <label>Loops <input type="number" id="loops" value="1" min="1" max="99"></label>
+    <label>File name <input type="text" id="filename" placeholder="自动换盘" size="18"></label>
+    <button class="primary" id="exportbtn" disabled>Export</button>
+  </fieldset>
+
+  <div id="result"></div>
+</main>
+
+<script>
+const playlist = [];   // {file_id, name, plates, plate_index, repeats}
+const dz = document.getElementById('dropzone');
+const fi = document.getElementById('fileinput');
+const ol = document.getElementById('playlist');
+const exportBtn = document.getElementById('exportbtn');
+
+async function loadPrinters() {
+  const r = await fetch('/api/printers');
+  const {printers} = await r.json();
+  const sel = document.getElementById('printer');
+  for (const p of [...printers, 'none']) {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p === 'none' ? 'none (no swap gcode)' : 'Bambu Lab ' + p;
+    sel.appendChild(o);
+  }
+}
+
+function parseTime(s) {
+  if (!s) return 0;
+  const g = u => { const m = s.match(new RegExp('(\\d+)' + u)); return m ? +m[1] : 0; };
+  return g('d') * 86400 + g('h') * 3600 + g('m') * 60 + g('s');
+}
+
+async function upload(file) {
+  const r = await fetch('/api/files?name=' + encodeURIComponent(file.name),
+                        {method: 'POST', body: file});
+  const data = await r.json();
+  if (!r.ok) { alert(data.error || 'upload failed'); return; }
+  if (!data.plates.length) { alert(file.name + ': no sliced plate found'); return; }
+  playlist.push({file_id: data.file_id, name: data.name,
+                 plates: data.plates, plate_index: 0, repeats: 1});
+  render();
+}
+
+function stats() {
+  const used = {}; let seconds = 0, count = 0;
+  const loops = +document.getElementById('loops').value || 1;
+  for (const it of playlist) {
+    const plate = it.plates[it.plate_index];
+    seconds += parseTime(plate.time) * it.repeats;
+    count += it.repeats;
+    for (const f of plate.filaments) {
+      const u = used[f.id] || {m: 0, g: 0, color: f.color, type: f.type};
+      u.m += f.used_m * it.repeats * loops; u.g += f.used_g * it.repeats * loops;
+      used[f.id] = u;
+    }
+  }
+  seconds *= loops;
+  const d = Math.floor(seconds / 86400), h = Math.floor(seconds % 86400 / 3600),
+        m = Math.floor(seconds % 3600 / 60), s = Math.round(seconds % 60);
+  let html = `<strong>${count * loops}</strong> plate(s), ` +
+    `<strong>${d ? d + 'd ' : ''}${h ? h + 'h ' : ''}${m}m ${s}s</strong> total`;
+  for (const id of Object.keys(used).sort((a, b) => a - b)) {
+    const u = used[id];
+    html += `<span class="fil"><i style="background:${u.color || '#fff'}"></i>` +
+      `filament ${id} (${u.type || '?'}): ${u.m.toFixed(2)} m / ${u.g.toFixed(2)} g</span>`;
+  }
+  document.getElementById('stats').innerHTML = playlist.length ? html : '';
+}
+
+function render() {
+  ol.innerHTML = '';
+  playlist.forEach((it, idx) => {
+    const li = document.createElement('li');
+    li.className = 'item';
+    const plate = it.plates[it.plate_index];
+    const fils = plate.filaments.map(f =>
+      `<span class="fil"><i style="background:${f.color || '#fff'}"></i>` +
+      `${f.id} ${f.type || ''} ${f.used_m}m</span>`).join('');
+    const plateSel = it.plates.length > 1
+      ? ` plate <select data-k="plate_index">` + it.plates.map(p =>
+          `<option value="${p.index}" ${p.index === it.plate_index ? 'selected' : ''}>` +
+          `${p.gcode_file.split('/').pop()}</option>`).join('') + `</select>`
+      : '';
+    li.innerHTML =
+      `<div><div class="name">${it.name}</div>` +
+      `<div class="meta">${plate.time || '?'} ·${plateSel} · ${fils}</div></div>` +
+      `<div class="controls">repeats ` +
+      `<input type="number" data-k="repeats" value="${it.repeats}" min="1" max="9999">` +
+      `<button data-a="up" ${idx === 0 ? 'disabled' : ''}>↑</button>` +
+      `<button data-a="down" ${idx === playlist.length - 1 ? 'disabled' : ''}>↓</button>` +
+      `<button data-a="rm">✕</button></div>`;
+    li.querySelectorAll('[data-k]').forEach(el => el.onchange = () => {
+      it[el.dataset.k] = +el.value; render();
+    });
+    li.querySelectorAll('[data-a]').forEach(el => el.onclick = () => {
+      const a = el.dataset.a;
+      if (a === 'rm') playlist.splice(idx, 1);
+      if (a === 'up' && idx > 0) [playlist[idx - 1], playlist[idx]] = [playlist[idx], playlist[idx - 1]];
+      if (a === 'down' && idx < playlist.length - 1) [playlist[idx + 1], playlist[idx]] = [playlist[idx], playlist[idx + 1]];
+      render();
+    });
+    ol.appendChild(li);
+  });
+  exportBtn.disabled = !playlist.length;
+  stats();
+}
+
+async function doExport() {
+  const res = document.getElementById('result');
+  res.className = ''; res.style.display = 'block'; res.textContent = 'exporting…';
+  exportBtn.disabled = true;
+  try {
+    const r = await fetch('/api/export', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        items: playlist.map(it => ({file_id: it.file_id,
+                                    plate_index: it.plate_index,
+                                    repeats: it.repeats})),
+        loops: +document.getElementById('loops').value || 1,
+        printer: document.getElementById('printer').value,
+        filename: document.getElementById('filename').value,
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'export failed');
+    const rep = data.report;
+    res.className = 'ok';
+    res.innerHTML =
+      `<a href="${data.download}">⬇ Download ${data.filename}</a>\n\n` +
+      `gcode: ${rep.gcode_bytes} bytes\nmd5: ${rep.gcode_md5}\n` +
+      `AMS boundaries cleaned: ${rep.ams_boundaries_cleaned}\n` +
+      (rep.ams_metadata_problems.length
+        ? 'WARNINGS:\n' + rep.ams_metadata_problems.map(p => '  ' + p).join('\n')
+        : 'AMS metadata: OK (filament maps & colors preserved)');
+    const a = document.createElement('a');
+    a.href = data.download; a.download = data.filename; a.click();
+  } catch (e) {
+    res.className = 'err'; res.textContent = 'Export failed: ' + e.message;
+  } finally {
+    exportBtn.disabled = !playlist.length;
+  }
+}
+
+dz.onclick = () => fi.click();
+fi.onchange = () => [...fi.files].forEach(upload);
+dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); };
+dz.ondragleave = () => dz.classList.remove('over');
+dz.ondrop = e => {
+  e.preventDefault(); dz.classList.remove('over');
+  [...e.dataTransfer.files].forEach(upload);
+};
+document.getElementById('loops').onchange = stats;
+exportBtn.onclick = doExport;
+loadPrinters();
+</script>
+</body>
+</html>

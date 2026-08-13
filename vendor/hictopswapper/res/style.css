@@ -1,0 +1,640 @@
+
+/* 定义全局变量，用于在样式中复用颜色 */
+:root {
+    --ci_1: #00BBDC; /* 定义第一个颜色变量 */
+    --ci_2: #00eeff; /* 定义第二个颜色变量 */
+}
+
+/* 图片样式 */
+.tu1 {
+    width: 260px; /* 设置图片宽度为400像素 */
+    height: 500px; /* 设置图片高度为600像素 */
+    object-fit: cover; /* 使图片填充整个区域，可能会裁剪部分图片 */
+}
+
+/* 全局字体设置 */
+* {
+    font-family: 'Noto Sans', 'Arial', sunserif; /* 设置默认字体 */
+}
+
+/* 页面主体样式 */
+body {
+    font-size: 14px; /* 设置字体大小 */
+    margin: 0; /* 移除默认外边距 */
+}
+
+/* 应用容器样式 */
+#app_wrapper {
+    max-width: 1200px; /* 设置最大宽度 */
+    margin: 0 auto; /* 水平居中 */
+    padding:0 10px 0 10px; /* 设置内边距 */
+    /* 下面两行被注释，可能是备用样式 */
+    /* background-color: #222; */
+    /* color: #ccc; */
+}
+
+
+
+/* 列表样式 */
+#playlist_ol {
+    padding: 0; /* 移除默认内边距 */
+    counter-reset: list-number; /* 初始化计数器 */
+}
+
+/* logo样式 */
+#logo {
+    padding: 5px 0 5px 0; /* 设置上下内边距 */
+}
+
+/* 列表项样式 */
+.list_item {
+    width: 200px; /* 设置宽度 */
+    height: 385px; /* 设置高度 */
+    background: #ccc; /* 设置背景颜色 */
+    border: #999 1px solid; /* 设置边框颜色和宽度 */
+    border-radius: 8px; /* 设置圆角 */
+    /* 下面两行被注释，可能是备用样式 */
+    /* list-style-type: decimal-leading-zero; */
+    opacity: 1; /* 设置透明度 */
+    padding: 5px 5px; /* 设置内边距 */
+    margin: 5px 5px; /* 设置外边距 */
+    display: inline-block; /* 设置为行内块元素 */
+    overflow-x: hidden; /* 隐藏水平溢出内容 */
+    overflow-y: hidden; /* 隐藏垂直溢出内容 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* scrollbar-gutter: stable; */
+}
+
+/* 列表项悬停时的样式 */
+.list_item:hover {
+    overflow-y: auto; /* 悬停时显示垂直滚动条 */
+}
+
+/* 列表项编号样式 */
+.list_item::before {
+    display: inline-block; /* 设置为行内块元素 */
+    width: 30px; /* 设置宽度 */
+    text-align: center; /* 文字居中 */
+    counter-increment: list-number; /* 增加计数器 */
+    content: counter(list-number); /* 显示计数器内容 */
+    font-size: 16pt; /* 设置字体大小 */
+    font-weight: 600; /* 设置字体粗细 */
+    vertical-align: top; /* 垂直对齐方式 */
+    margin-top: 5px; /* 设置上外边距 */
+    color: #777; /* 设置文字颜色 */
+}
+
+/* 单行文本样式 */
+.single-line {
+    width: 100%; /* 设置宽度 */
+    overflow: hidden; /* 隐藏溢出内容 */
+    text-overflow: ellipsis; /* 显示省略号 */
+    white-space: nowrap; /* 不换行 */
+    display: inline-block; /* 设置为行内块元素 */
+}
+
+/* 文件名输入框样式 */
+#file_name {
+    width: 310px; /* 设置宽度 */
+    height: 26px; /* 设置高度 */
+    background: #fafafa; /* 设置背景颜色 */
+    border-radius: 5px; /* 设置圆角 */
+    margin-top: 5px; /* 设置上外边距 */
+}
+
+/* 文件名旁的文本样式 */
+.p_name {
+    display: inline-block; /* 设置为行内块元素 */
+    color: #888; /* 设置文字颜色 */
+}
+
+/* 文件标题样式 */
+.p_title {
+    width: 150px; /* 设置宽度 */
+    display: inline-block; /* 设置为行内块元素 */
+    margin-bottom: 8px; /* 设置下外边距 */
+    overflow: hidden; /* 隐藏溢出内容 */
+}
+
+/* 文件ID样式 */
+.f_id {
+    display: none; /* 隐藏文件ID */
+}
+
+/* 文件图标样式 */
+.p_icon {
+    width: 200px; /* 设置宽度 */
+    height: 200px; /* 设置高度 */
+    background-color: #ddd; /* 设置背景颜色 */
+    border-radius: 4px; /* 设置圆角 */
+}
+
+/* 文件信息样式 */
+.p_info {
+    display: inline-block; /* 设置为行内块元素 */
+    width: 190px; /* 设置宽度 */
+    padding: 10px 5px; /* 设置内边距 */
+}
+
+/* 文件时间样式 */
+.p_time {
+    display: inline-block; /* 设置为行内块元素 */
+    vertical-align: middle; /* 垂直居中 */
+    font-size: 14pt; /* 设置字体大小 */
+    color: #777; /* 设置文字颜色 */
+}
+
+/* 文件重复样式 */
+.p_rep {
+    width: 55px; /* 设置宽度 */
+    height: 25px; /* 设置高度 */
+    background: #fafafa; /* 设置背景颜色 */
+    border-radius: 4px; /* 设置圆角 */
+    font-size: 14pt; /* 设置字体大小 */
+    font-weight: 500; /* 设置字体粗细 */
+    background-color: #ddd; /* 设置背景颜色 */
+    float: right; /* 设置为右浮动 */
+    text-align: center; /* 文字居中 */
+}
+
+/* 循环次数输入框样式 */
+#loops {
+    width: 55px; /* 设置宽度 */
+    border-radius: 4px; /* 设置圆角 */
+    font-weight: 500; /* 设置字体粗细 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* float: right; */
+    margin-right: 5px; /* 设置右外边距 */
+    text-align: center; /* 文字居中 */
+}
+
+/* 打印机型号输入框样式 */
+#printer_model {
+    width: 100px; /* 设置宽度 */
+    border-radius: 2px; /* 设置圆角 */
+    font-weight: 1000; /* 设置字体粗细 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* float: right; */
+    margin-right: 20px; /* 设置右外边距 */
+    text-align: center; /* 文字居中 */
+}
+
+/* 文件信息样式 */
+.p_filaments {
+    margin-top: 5px; /* 设置上外边距 */
+    width: 200px; /* 设置宽度 */
+}
+
+/* 循环次数样式 */
+.loops {
+    width: 50px; /* 设置宽度 */
+    height: 20px; /* 设置高度 */
+    background: #fafafa; /* 设置背景颜色 */
+    border-radius: 4px; /* 设置圆角 */
+}
+
+/* 列表项原型样式 */
+#list_item_prototype {
+    display: none; /* 隐藏列表项原型 */
+}
+
+/* 文件ID样式 */
+.f_id {
+    /* 下面一行被注释，可能是备用样式 */
+    /* display: none; */
+}
+
+/* 占位符样式 */
+::placeholder {
+    color: #888; /* 设置占位符文字颜色 */
+}
+
+/* 列表提示样式 */
+#playlist_ol li.hint {
+    /* 下面一行被注释，可能是备用样式 */
+    /* margin: 10px 0; */
+}
+
+/* 目标列表项样式 */
+#playlist_ol li.targeted {
+    background: #C3E1ED; /* 设置背景颜色 */
+    opacity: 0.3; /* 设置透明度 */
+}
+
+/* 激活的列表项样式 */
+#playlist_ol li.active {
+    background: #f5f5f5; /* 设置背景颜色 */
+    border-right: 5px solid var(--ci_1); /* 设置右边框颜色和宽度 */
+    margin: 5px 0 -5px 0; /* 设置外边距 */
+}
+
+/* 激活的列表项中的一些元素样式 */
+#playlist_ol li.active .file-input,
+#playlist_ol li.active ._p_rep,
+.p_time,
+li.active .p_info,
+.p_icon {
+    pointer-events: none; /* 禁用鼠标事件 */
+}
+
+/* 总大小标签样式 */
+#total_size_label {
+    font-weight: 600; /* 设置字体粗细 */
+    font-size: 16px; /* 设置字体大小 */
+    text-align: center; /* 文字居中 */
+    padding: 10px 10px; /* 设置内边距 */
+    position: relative; /* 设置为相对定位 */
+    top: -30px; /* 向上偏移30像素 */
+    min-width: 100px; /* 设置最小宽度 */
+    color: #aaa; /* 设置文字颜色 */
+}
+
+/* 进度条容器样式 */
+#progress_bar {
+    /* 下面一行被注释，可能是备用样式 */
+    /* margin: 300px 40px; */
+    background-color: #eee; /* 设置背景颜色 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* margin: 30px auto; */
+    display: block; /* 设置为块元素 */
+    height: 5px; /* 设置高度 */
+    width: 100px; /* 设置宽度 */
+    border: 1px solid #ccc; /* 设置边框颜色和宽度 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* opacity: 0; */
+}
+
+/* 进度条样式 */
+#progress_scale {
+    height: 100%; /* 设置高度 */
+    background-color: var(--ci_1); /* 设置背景颜色 */
+    width: 50%; /* 设置宽度 */
+    /* 下面一行被注释，可能是备用样式 */
+    /* animation: pulse 2s; */
+    animation-iteration-count: infinite; /* 设置动画无限循环 */
+    animation: move 2s ease infinite; /* 设置动画效果 */
+    background: linear-gradient(90deg, var(--ci_1), var(--ci_1), var(--ci_2), var(--ci_1), var(--ci_1)); /* 设置渐变背景 */
+    background-size: 300% 100%; /* 设置背景大小 */
+}
+
+/* 颜色块样式 */
+.f_color {
+    height: 20px; /* 设置高度 */
+    width: 20px; /* 设置宽度 */
+    border-radius: 11px; /* 设置圆角 */
+    border: solid 1px #888; /* 设置边框颜色和宽度 */
+    display: inline-block; /* 设置为行内块元素 */
+}
+
+/* 文件信息样式 */
+.p_filament {
+    display: inline-block; /* 设置为行内块元素 */
+    font-size: 6pt; /* 设置字体大小 */
+    text-align: center; /* 文字居中 */
+    width: 40px; /* 设置宽度 */
+}
+
+/* 文件信息原型样式 */
+.p_filament_prototype {
+    display: none; /* 隐藏文件信息原型 */
+}
+
+/* 移动动画关键帧 */
+@keyframes move {
+    0% {
+        background-position: 100% 50% /* 设置背景位置 */
+    }
+    /* 下面一行被注释，可能是备用样式 */
+    /* 50%{background-position:50% 50%} */
+    100% {
+        background-position: 0% 50% /* 设置背景位置 */
+    }
+}
+
+/* 非活动状态样式 */
+.inactive {
+    color: #aaa; /* 设置文字颜色 */
+    opacity: 0.5; /* 设置透明度 */
+}
+
+/* 文件名和文件名旁的文本样式 */
+#file_name,
+#file_name~span {
+    font-family: 'Courier New', Courier, monospace; /* 设置字体 */
+}
+
+/* 文件名旁的文本样式 */
+#file_name~span {
+    color: #777; /* 设置文字颜色 */
+}
+
+/* 细节摘要样式 */
+details summary {
+    cursor: pointer; /* 设置鼠标指针为手型 */
+}
+
+/* 工具信息样式 */
+.tool_info,
+details.tool_info summary {
+    display: inline; /* 设置为行内元素 */
+}
+
+/* 打开的工具信息样式 */
+.tool_info[open] {
+    padding: 8px; /* 设置内边距 */
+    background-color: #eee; /* 设置背景颜色 */
+}
+
+/* 打开的工具信息样式 */
+details[open].tool_info {
+    display: block; /* 设置为块元素 */
+    margin: 5px auto; /* 设置外边距 */
+}
+
+/* 打开的工具信息摘要样式 */
+details[open].tool_info summary::before {
+    content: 'X'; /* 设置内容为'X' */
+    background-color: #EDF07A; /* 设置背景颜色 */
+    width: 30px; /* 设置宽度 */
+    border-radius: 3px; /* 设置圆角 */
+    display: inline-block; /* 设置为行内块元素 */
+    text-align: center; /* 文字居中 */
+}
+
+/* 工具信息摘要样式 */
+details.tool_info summary::before {
+    content: '( ? )'; /* 设置内容为'( ? )' */
+}
+
+/* 工具信息摘要样式 */
+.tool_info > summary {
+    color: #777; /* 设置文字颜色 */
+}
+
+/* 调试轮廓样式 */
+#debug_outline:checked~* * {
+    border: #00BBDC 1px solid; /* 设置边框颜色和宽度 */
+}
+
+/* 调试轮廓悬停样式 */
+#debug_outline:checked~* *:hover {
+    border: #f00 1px dotted; /* 设置边框颜色和样式 */
+}
+
+/* 应用头部样式 */
+#app_header {
+    width: 850px; /* 设置宽度 */
+    overflow: auto; /* 自动滚动 */
+    border-bottom: #555 0px solid; /* 设置下边框线颜色和宽度 */
+}
+
+/* 应用头部子元素样式 */
+#app_header>div {
+    display: block; /* 设置为块元素 */
+    vertical-align: middle; /* 垂直居中 */
+    overflow: auto; /* 自动滚动 */
+}
+
+/* 应用头部第一个子元素样式 */
+#app_header>*:nth-child(1) {
+    /* 下面一行被注释，可能是备用样式 */
+    /* width: 50%; */
+    float: left /* 设置为左浮动 */
+}
+
+/* 应用头部第二个子元素样式 */
+#app_header>*:nth-child(2) {
+    width: 170px; /* 设置宽度 */
+    text-align: left; /* 文字左对齐 */
+    float: right /* 设置为右浮动 */
+}
+
+/* 队列统计样式 */
+#queue_statistics>*>*:nth-child(1) {
+    display: inline-block; /* 设置为行内块元素 */
+    width: 9ch; /* 设置宽度 */
+    font-size: 10pt; /* 设置字体大小 */
+}
+
+/* 总时间样式 */
+#total_time {
+    font-size: 13pt; /* 设置字体大小 */
+    font-weight: 100; /* 设置字体粗细 */
+}
+
+/* 使用的板数样式 */
+#used_plates {
+    font-size: 13pt; /* 设置字体大小 */
+    font-weight: 100; /* 设置字体粗细 */
+}
+
+/* 统计样式 */
+#statistics>div {
+    margin-top: 10px; /* 设置上外边距 */
+    margin-bottom: 10px; /* 设置下外边距 */
+}
+
+/* 队列统计样式 */
+#queue_statistics {
+    padding-right: 20px; /* 设置右内边距 */
+    /*border-right: #262e30 1px solid;  设置右边框颜色和宽度 */
+    padding-right: 20px; /* 设置右内边距 */
+    margin-right: 20px; /* 设置右外边距 */
+}
+
+/* 耗材总量样式 */
+#filament_total>div {
+    margin-right: 20px; /* 设置右外边距 */
+    display: inline-block; /* 设置为行内块元素 */
+}
+
+/* 统计标题样式 */
+#statistics h3 {
+    margin: 0 0 5px 0; /* 设置外边距 */
+}
+
+/* 统计样式 */
+#statistics>div {
+    display: inline-block; /* 设置为行内块元素 */
+    vertical-align: text-top; /* 垂直对齐方式 */
+}
+
+/* 导出按钮样式 */
+
+/* 导出按钮悬停样式 */
+#export:hover {
+    background-color: #00AAFF; /* 设置背景颜色 */
+}
+
+/* 显示设置容器样式 */
+#show_set_cont {
+    margin-top: 20px; /* 设置上外边距 */
+}
+ 
+
+/* 重置按钮悬停样式 */
+#reset:hover {
+    background-color: #FFC400; /* 设置背景颜色 */
+}
+
+/* 拖拽区域容器样式 */
+#drop_zones_wrapper {
+    display: flex; /* 设置为弹性布局 */
+    justify-content: space-between; /* 子元素间距均匀分布 */
+    width: 100%; /* 设置宽度 */
+    height: 100%; /* 设置高度 */
+    background-color: #F5F5F5; /* 设置背景颜色 */
+}
+
+/* 拖拽区域样式 */
+#drop_zone,
+#drop_zone_instant {
+    border: 3px solid #589297; /* 设置边框颜色和宽度 */
+    border-radius: 7px; /* 设置圆角 */
+    border-style: dotted; /* 设置边框样式 */
+    display: flex; /* 设置为弹性布局 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    padding: 10px; /* 设置内边距 */
+    transition: background-color 0.3s ease; /* 设置背景颜色过渡效果 */
+}
+
+/* 拖拽区域样式 */
+#drop_zone {
+    background-color: #d0fbff; /* 设置背景颜色 */
+    width: 100%; /* 设置宽度 */
+    margin-right: 20px; /* 设置右外边距 */
+}
+
+/* 即时拖拽区域样式 */
+#drop_zone_instant {
+    background-color: #fff4e6; /* 设置背景颜色 */
+    width: 50%; /* 设置宽度 */
+}
+
+/* 拖拽区域悬停样式 */
+#drop_zone:hover,
+#drop_zone_instant:hover {
+    background-color: #fefaf4; /* 设置背景颜色 */
+}
+
+/* 隐藏迷你拖拽区域的样式 */
+.mini_drop_zone #drop_zone_instant,
+.mini_drop_zone #spacer_cell {
+    display: none; /* 隐藏元素 */
+}
+
+/* 迷你拖拽区域样式 */
+#drop_zones_wrapper.mini_drop_zone {
+    height: 10px; /* 设置高度 */
+}
+
+/* 迷你拖拽区域中的段落样式 */
+#drop_zones_wrapper.mini_drop_zone p {
+    font-size: 16pt; /* 设置字体大小 */
+}
+
+/* 迷你拖拽区域中的div样式 */
+#drop_zones_wrapper.mini_drop_zone div {
+    padding: 5px; /* 设置内边距 */
+}
+
+/* 聚焦的拖拽区域样式 */
+#drop_zones_wrapper.focused {
+    height: 10px; /* 设置高度 */
+}
+
+/* 聚焦的迷你拖拽区域样式 */
+#drop_zones_wrapper.mini_drop_zone.focused {
+    height: 10px; /* 设置高度 */
+}
+
+/* 拖拽区域样式 */
+#drop_zone,
+#drop_zone_instant {
+    vertical-align: middle; /* 垂直居中 */
+}
+
+/* 拖拽区域中的段落和图标样式 */
+#drop_zone>p,
+#drop_zone>i {
+    text-align: center; /* 文字居中 */
+    color: #9DB0CC; /* 设置文字颜色 */
+}
+
+/* 拖拽区域中的段落样式 */
+#drop_zone>p {
+    font-weight: 800; /* 设置字体粗细 */
+    font-size: 22pt; /* 设置字体大小 */
+    margin: 0; /* 移除默认外边距 */
+}
+
+/* 拖拽区域中的图标样式 */
+#drop_zone>i {
+    display: block; /* 设置为块元素 */
+    font-size: 16pt; /* 设置字体大小 */
+}
+
+/* 即时拖拽区域中的段落样式 */
+#drop_zone_instant>p {
+    text-align: center; /* 文字居中 */
+    font-weight: 300; /* 设置字体粗细 */
+    color: #9DB0CC; /* 设置文字颜色 */
+    font-size: 20pt; /* 设置字体大小 */
+}
+
+/* 即时拖拽区域中的图标样式 */
+#drop_zone_instant i {
+    font-weight: 800; /* 设置字体粗细 */
+}
+
+/* 应用内容样式 */
+#app_content {
+    padding-top: 20px; /* 设置上内边距 */
+    display: table; /* 设置为表格布局 */
+    width: 100%; /* 设置宽度 */
+}
+
+/* 设置容器样式 */
+#settings_wrapper {
+    min-width: 100px; /* 设置最小宽度 */
+    width: 300px; /* 设置宽度 */
+    padding: 0 20px; /* 设置内边距 */
+    vertical-align: top; /* 垂直对齐方式 */
+    display: table-cell; /* 设置为表格单元格 */
+}
+
+/* 设置容器中的div样式 */
+#settings_wrapper>div {
+    border-left: #555 1px solid; /* 设置左边框颜色和宽度 */
+    padding-left: 20px; /* 设置左内边距 */
+    height: 100px; /* 设置高度 */
+}
+
+/* 板材容器样式 */
+#plates_wrapper {
+    display: table-cell; /* 设置为表格单元格 */
+}
+
+/* 设置容器样式 */
+#settings_wrapper {
+    display: table-cell; /* 设置为表格单元格 */
+}
+
+/* 间隔单元格样式 */
+#spacer_cell {
+    display: table-cell; /* 设置为表格单元格 */
+    min-width: 20px; /* 设置最小宽度 */
+}
+
+/* 版本信息样式 */
+#version {
+    color: #bbb; /* 设置文字颜色 */
+    text-align: right; /* 文字右对齐 */
+    size: 10px; /* 设置字体大小 */
+}
+
+/* 隐藏元素样式 */
+.hidden {
+    display: none; /* 隐藏元素 */
+}

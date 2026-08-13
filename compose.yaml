@@ -1,0 +1,26 @@
+services:
+  # Web UI — `docker compose up`, then open http://localhost:8080
+  web:
+    build: .
+    image: hictopswapper
+    ports:
+      - "${HICTOP_PORT:-8080}:8080"
+    command: ["serve", "--host", "0.0.0.0", "--port", "8080"]
+    restart: unless-stopped
+
+  # CLI — `docker compose run --rm hictopswapper <subcommand> ...`
+  # (kept behind a profile so plain `up` only starts the web UI)
+  hictopswapper:
+    build: .
+    image: hictopswapper
+    profiles: ["cli"]
+    # Mount the project dir so relative input/output paths just work.
+    # Override with HICTOP_DATA=/path/to/files if your 3MFs live elsewhere.
+    volumes:
+      - ${HICTOP_DATA:-.}:/data
+    working_dir: /data
+    # Entrypoint is the hictopswapper CLI; pass subcommands after the
+    # service name, e.g.:
+    #   docker compose run --rm hictopswapper export in.3mf --repeats 2 -o out.3mf
+    #   docker compose run --rm hictopswapper analyze in.3mf
+    #   docker compose run --rm hictopswapper diff a.3mf b.3mf
